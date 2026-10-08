@@ -1,0 +1,44 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Autonomous Proxy Scraper M2M",
+    "version": "1.0.0",
+    "description": "High-frequency web scraper for AI agents. Requires 402 L402 payment in USDC on Base."
+  },
+  "servers": [
+    {
+      "url": "https://wicked-bears-laugh.loca.lt"
+    }
+  ],
+  "paths": {
+    "/api/v1/agent/proxy-scrape": {
+      "post": {
+        "summary": "Scrape a target URL.",
+        "description": "Returns a 402 Payment Required if no L402 header is provided. To access, execute a 0.01 USDC transfer to the receiver on Base, and resubmit with 'Authorization: L402 <tx_hash>'.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target_url": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Scraped data payload"
+          },
+          "402": {
+            "description": "Payment Required. Contains 'payment_info' JSON for the agent to execute the transaction."
+          }
+        }
+      }
+    }
+  }
+}
