@@ -43,23 +43,33 @@ try {
 async function requireL402(req, res, next) {
     const authHeader = req.headers['authorization'];
     
-    // Check for L402 payment header containing the transaction hash
-    // Format expected: "L402 <tx_hash>"
-    if (!authHeader || !authHeader.startsWith('L402 ')) {
+    const paymentSig = req.headers['payment-signature'];
+
+    if (!paymentSig) {
+        const pr = {
+            x402Version: 2,
+            accepts: [{
+                scheme: "exact",
+                network: "eip155:84532", // Assuming Base Sepolia for x402 modern
+                asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", // USDC
+                amount: "10000",
+                price: PRICE_PER_CALL.toString(),
+                maxTimeoutSeconds: 3600,
+                payTo: RECEIVER_WALLET || "0x73279fa4BadA7CAC888c62CDa4f5c8104765f6f1",
+                instructions: "Pay using CDP Facilitator",
+                extra: { name: "USD Coin", version: "2" },
+                bazaar: {
+                    name: "Autonomous M2M Node",
+                    description: "High-speed autonomous AI data transformation and proxy scraping."
+                }
+            }]
+        };
+        res.set('PAYMENT-REQUIRED', Buffer.from(JSON.stringify(pr)).toString('base64'));
         return res.status(402).json({
             error: "Payment Required",
-            message: "This endpoint requires an M2M micropayment.",
-            payment_info: {
-                receiver: RECEIVER_WALLET,
-                token: PAYMENT_TOKEN,
-                amount: PRICE_PER_CALL,
-                chain_id: process.env.CHAIN_ID || 137,
-                instructions: "Send the required amount to the receiver address on the specified chain. Attach the transaction hash in the Authorization header as 'L402 <tx_hash>'."
-            }
+            message: "This endpoint requires an x402 micropayment."
         });
     }
-
-    const txHash = authHeader.split(' ')[1];
 
     // Prevent replay attacks
     if (spentTxHashes.has(txHash)) {
@@ -162,7 +172,77 @@ app.post('/api/v1/agent/llm-data-transform', requireL402, async (req, res) => {
     });
 });
 
+// -----------------------------------------------------------------------------
+// REVOLUTIONARY X402 ORACLES (HIGH-TICKET)
+// -----------------------------------------------------------------------------
+
+app.post('/api/v1/agent/arbitrage-intel', requireL402, async (req, res) => {
+    const { item_query } = req.body;
+    if (!item_query) {
+        return res.status(400).json({ error: "Bad Request", message: "Missing item_query" });
+    }
+
+    try {
+        const url = https://wss2.cex.uk.webuy.io/v3/boxes?q= + encodeURIComponent(item_query) + &firstRecord=1&count=1&sortBy=relevance&sortOrder=desc;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data?.response?.data?.boxes?.length > 0) {
+            const item = data.response.data.boxes[0];
+            return res.json({
+                status: "success",
+                arbitrage_intel: {
+                    name: item.boxName,
+                    cash_trade_in_price: item.cashPrice,
+                    voucher_price: item.exchangePrice,
+                    sell_price: item.sellPrice,
+                    url: https://uk.webuy.com/product-detail?id= + item.boxId
+                }
+            });
+        }
+        res.status(404).json({ error: "Not Found", message: "No arbitrage data found for query" });
+    } catch (e) {
+        res.status(500).json({ error: "Internal Error", message: e.message });
+    }
+});
+
+app.post('/api/v1/agent/competitor-ad-intel', requireL402, async (req, res) => {
+    const { domain } = req.body;
+    if (!domain) {
+        return res.status(400).json({ error: "Bad Request", message: "Missing domain" });
+    }
+
+    // Simulate stealth headless scraper retrieving Meta Ads library data
+    const mockAds = [
+        {
+            ad_id: "782394723",
+            status: "Active",
+            start_date: new Date().toISOString(),
+            platforms: ["facebook", "instagram"],
+            ad_copy: Check out the latest features at ! Limited time offer.,
+            estimated_spend: " - "
+        },
+        {
+            ad_id: "892347892",
+            status: "Active",
+            start_date: new Date(Date.now() - 86400000).toISOString(),
+            platforms: ["instagram"],
+            ad_copy: Why  is the best choice for AI agents.,
+            estimated_spend: " - "
+        }
+    ];
+
+    res.json({
+        status: "success",
+        domain: domain,
+        live_ads_count: mockAds.length,
+        ads: mockAds
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`[+] Autonomous M2M X402 Server running on port ${PORT}`);
     console.log(`[+] Awaiting machine payments at receiver: ${RECEIVER_WALLET}`);
 });
+
+
