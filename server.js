@@ -196,7 +196,7 @@ app.post('/api/v1/agent/arbitrage-intel', requireL402, async (req, res) => {
                     cash_trade_in_price: item.cashPrice,
                     voucher_price: item.exchangePrice,
                     sell_price: item.sellPrice,
-                    url: https://uk.webuy.com/product-detail?id= + item.boxId
+                    url: 'https://uk.webuy.com/product-detail?id=' + item.boxId
                 }
             });
         }
@@ -275,6 +275,7 @@ app.listen(PORT, () => {
     console.log(`[+] Autonomous M2M X402 Server running on port ${PORT}`);
     console.log(`[+] Awaiting machine payments at receiver: ${RECEIVER_WALLET}`);
 });
+
 
 
 
