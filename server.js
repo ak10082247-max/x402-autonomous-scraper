@@ -206,10 +206,41 @@ app.post('/api/v1/agent/arbitrage-intel', requireL402, async (req, res) => {
     }
 });
 
-app.post('/api/v1/agent/competitor-ad-intel', requireL402, async (req, res) => {
-    const { domain } = req.body;
+app.post('/api/v1/agent/domain-seo-intel', requireL402, async (req, res) => {
+    let { domain } = req.body;
     if (!domain) {
         return res.status(400).json({ error: "Bad Request", message: "Missing domain" });
+    }
+    if (!domain.startsWith('http')) domain = 'https://' + domain;
+
+    try {
+        const response = await fetch(domain, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }});
+        const html = await response.text();
+        
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["'][^>]*>/i) || html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["'][^>]*>/i);
+        
+        const linksCount = (html.match(/<a href=/g) || []).length;
+        const imagesCount = (html.match(/<img src=/g) || []).length;
+        const wordCount = html.replace(/<[^>]*>?/gm, ' ').split(/\s+/).length;
+
+        res.json({
+            status: "success",
+            domain: domain,
+            seo_intel: {
+                title: titleMatch ? titleMatch[1].trim() : null,
+                description: descMatch ? descMatch[1].trim() : null,
+                metrics: {
+                    word_count: wordCount,
+                    total_links: linksCount,
+                    total_images: imagesCount
+                }
+            }
+        });
+    } catch (e) {
+        res.status(500).json({ error: "Scrape Failed", message: e.message });
+    }
+});
     }
 
     // Simulate stealth headless scraper retrieving Meta Ads library data
