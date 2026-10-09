@@ -183,7 +183,7 @@ app.post('/api/v1/agent/arbitrage-intel', requireL402, async (req, res) => {
     }
 
     try {
-        const url = https://wss2.cex.uk.webuy.io/v3/boxes?q= + encodeURIComponent(item_query) + &firstRecord=1&count=1&sortBy=relevance&sortOrder=desc;
+        const url = 'https://wss2.cex.uk.webuy.io/v3/boxes?q=' + encodeURIComponent(item_query) + '&firstRecord=1&count=1&sortBy=relevance&sortOrder=desc';
         const response = await fetch(url);
         const data = await response.json();
         
@@ -275,5 +275,6 @@ app.listen(PORT, () => {
     console.log(`[+] Autonomous M2M X402 Server running on port ${PORT}`);
     console.log(`[+] Awaiting machine payments at receiver: ${RECEIVER_WALLET}`);
 });
+
 
 
