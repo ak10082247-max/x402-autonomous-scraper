@@ -241,40 +241,12 @@ app.post('/api/v1/agent/domain-seo-intel', requireL402, async (req, res) => {
         res.status(500).json({ error: "Scrape Failed", message: e.message });
     }
 });
-    }
-
-    // Simulate stealth headless scraper retrieving Meta Ads library data
-    const mockAds = [
-        {
-            ad_id: "782394723",
-            status: "Active",
-            start_date: new Date().toISOString(),
-            platforms: ["facebook", "instagram"],
-            ad_copy: Check out the latest features at ! Limited time offer.,
-            estimated_spend: " - "
-        },
-        {
-            ad_id: "892347892",
-            status: "Active",
-            start_date: new Date(Date.now() - 86400000).toISOString(),
-            platforms: ["instagram"],
-            ad_copy: Why  is the best choice for AI agents.,
-            estimated_spend: " - "
-        }
-    ];
-
-    res.json({
-        status: "success",
-        domain: domain,
-        live_ads_count: mockAds.length,
-        ads: mockAds
-    });
-});
 
 app.listen(PORT, () => {
     console.log(`[+] Autonomous M2M X402 Server running on port ${PORT}`);
     console.log(`[+] Awaiting machine payments at receiver: ${RECEIVER_WALLET}`);
 });
+
 
 
 
