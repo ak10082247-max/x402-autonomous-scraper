@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: x402-autonomous-node
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 4020
+      - key: NODE_ENV
+        value: production
+      - key: RPC_ENDPOINT
+        sync: false
+      - key: RECEIVER_WALLET_ADDRESS
+        sync: false
+      - key: PAYMENT_TOKEN_ADDRESS
+        sync: false
+      - key: PRICE_PER_CALL
+        sync: false
+      - key: CHAIN_ID
+        sync: false
